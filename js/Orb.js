@@ -2,6 +2,7 @@ function Orb(id, opts) {
     this.id = id;
     this.x = 0;
     this.y = 0;
+    this.z = 1;
     this.height = 0;
     this.width = 0;
     this.radius = 0;
@@ -41,23 +42,22 @@ function Orb(id, opts) {
             i = this.currentAnimation;
             this.currentAnimation++;
         }
+
         if(i < this.animations.length){
             this.getElement().promise().done(function(){
-                this.animate({
-                    "left" : that.animations[i][0],
-                    "top" : that.animations[i][1]
-                }, that.animations[i][2], "linear", function(){
+              //  console.log(that.animations[i][0]);
+                this.animate(that.animations[i][0], that.animations[i][1], "linear", function(){
                     if(that.animations[i])
                     {
                         that.animateStep();
                     }
-                    if(that.animations[i][3]){
-                        that.animations[i][3]();
+                    if(that.animations[i][2]){
+                        that.animations[i][2]();
                     }
                 });
             });
         }
-    }
+    };
 
     this.play = function(){
         this.animateStep();
@@ -72,10 +72,10 @@ function Orb(id, opts) {
         var that = this;
         var last = this.animations[this.animations.length - 1];
         var temp;
-        if(last.length === 4){
-            temp = last[3];
+        if(last.length === 3){
+            temp = last[2];
         }
-        last[3] = function(){
+        last[2] = function(){
             if(temp){
                 temp();
             }
@@ -94,6 +94,15 @@ function Orb(id, opts) {
 
     this.stop = function(){
         clearInterval(this.intervalId);
+    };
+
+    this.setZ = function(z){
+        this.z = z;
+        this.getElement().css({"z-index":z});
+        return this;
+    };
+    this.getZ = function(z){
+        return z;
     };
 
     this.getId = function() {

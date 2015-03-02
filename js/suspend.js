@@ -53,8 +53,8 @@ function main() {
     var sun = new Orb(0, {
         "blurAmount" : 50
     });
-    sun.setX(50);
-    sun.setY(50);
+    sun.setX($plane.width()/2 - 250);
+    sun.setY($plane.height()/2 - 250);
     sun.setWidth(500);
     sun.setHeight(500);
     sun.setRadius(100);
@@ -64,22 +64,63 @@ function main() {
     sun.build();
 
     var particles = [];
-    
-    var particle = new Orb(1, {
-        "blurAmount" : 3
-    });
-    particle.setX(50);
-    particle.setY(50);
-    particle.setWidth(100);
-    particle.setHeight(100);
-    particle.setRadius(25);
-    particle.setCircleX(50);
-    particle.setCircleY(50);
-    particle.setColor("white");
-    particle.build();
 
+    for(var i = 0; i < 4; i++){
+        var particle = new Orb(1, {
+            "blurAmount" : 3
+        });
+       // particle.setX(50);
+     //   particle.setY(50);
+        particle.setWidth(100);
+        particle.setHeight(100);
+        particle.setRadius(25);
+        particle.setCircleX(50);
+        particle.setCircleY(50);
+        particle.setColor("white");
+        particle.build();
+        particles.push(particle);
+    }
+    $plane.append(sun.getElement());//.append(particle.getElement());
 
-    $plane.append(sun.getElement()).append(particle.getElement());
+    var sunCenter = sun.getCenter();
+    var x = sunCenter[0] + sun.getX();
+    var y = sunCenter[1] + sun.getY();
+    var baseX = x - 50;
+    var baseY = y - 50;
+
+    particles[0].setX(baseX).setY(Math.abs(baseY - 250));
+    particles[1].setX(baseX + 250).setY(baseY);
+    particles[2].setX(baseX).setY(baseY + 250);
+    particles[3].setX(baseX - 250).setY(baseY);
+
+    var a0 = [{
+        "top": "+=" + (baseY + 250),
+        "opacity" : 0
+    }, 1000];
+    var a1 = [{
+        "top":  (baseY - 250),
+        "opacity" : 1
+    }, 1000];
+    particles[0].addAnimation(a0);
+    particles[0].addAnimation(a1);
+    particles[0].setZ(100);
+    for(var i = 0; i < particles.length; i++){
+        $plane.append(particles[i].getElement());
+    }
+   // particles[0].loop();
+
+    sun.setZ("1");
+    var clicked = false;
+    $("body").click(function(){
+        if(clicked){
+            clicked = false;
+            particles[0].stop();
+        }
+        else {
+            clicked = true;
+            particles[0].loop();
+        }
+    })
 
 
 }

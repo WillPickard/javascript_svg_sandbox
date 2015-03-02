@@ -139,10 +139,16 @@ function Floater(opts){
 
         var  y = orb.getY();
 
-        animation0 = ["+="+dx, y, t1, function(){
+        animation0 = [{
+            "left" : "+="+dx,
+            "top" : y
+        }, t1, function(){
             orb.setX("-100");
         }];
-        animation1 = [x, y, t2];
+        animation1 = [{
+            "left" : x,
+            "top" : y
+        }, t2];
         orb.addAnimation(animation0);
         orb.addAnimation(animation1);
         if(loop){
@@ -204,10 +210,16 @@ function Floater(opts){
 
         var  y = orb.getY();
 
-        animation0 = ["-="+dx, y, t1, function(){
+        animation0 = [{
+            "left" : "-="+dx,
+            "top": y
+        }, t1, function(){
             orb.setX(planeWidth + orb.getWidth());
         }];
-        animation1 = [x, y, t2, function(){
+        animation1 = [{
+            "left" : x,
+            "top" : y
+        }, t2, function(){
             orb.setX(x);
         }];
         orb.addAnimation(animation0);
