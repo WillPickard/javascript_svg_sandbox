@@ -167,7 +167,9 @@ function OrbController(numOrbs, max, min, opts)
         this.clear();
 
         for(var i = 0; i < this.count(); i++) {
-            var orb = new Orb(i, {});
+            var orb = new Orb(i, {
+                "blurAmount" : this.blurAmount
+            });
             this.actuator.placeOrb(orb);
             this.getColorController().colorize(orb);
             this.orbs.push(orb);
@@ -208,6 +210,7 @@ function OrbController(numOrbs, max, min, opts)
 
     };
 
+
     this.numOrbs = numOrbs;
     this.orbs = [];
     this.maxOrbSize = max;
@@ -215,6 +218,7 @@ function OrbController(numOrbs, max, min, opts)
     this.paths = opts["paths"] ? opts["paths"] : [];
     this.plane = (opts["plane"]) ? opts["plane"] : $("body");
     this.colorController = (opts["colorController"]) ? opts["colorController"] : this._colorController();
+    this.blurAmount = opts["blurAmount"] ? opts["blurAmount"] : Math.round(Math.random() + 2);
     this.actuator =  opts["actuator"] ? opts["actuator"] : new Floater({
         "plane" : this.getPlane(),
         "orbs" : this.getOrbs(),

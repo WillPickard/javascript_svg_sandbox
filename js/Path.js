@@ -93,7 +93,12 @@ function Path(o1, o2, opt)
         //this.build();
     };
 
-    this.addCommand = function(comm){
+    this.addCommand = function(comm, i){
+        if(i){
+            //i represents the index of the command that will precede the newly added one
+            var removed = this.commands.splice(i, 0, comm);
+            return this;
+        }
         this.commands.push(comm);
         return this;
     };
@@ -139,8 +144,15 @@ function Path(o1, o2, opt)
         my = this.getMaster().getY() + mCenter[1];
         sx = this.getSlave().getX() + sCenter[0];
         sy = this.getSlave().getY() + sCenter[1];
-        this.moveTo(mx, my);
-        this.lineTo(sx, sy);
+
+        if(this.usingBezier()){
+            this.moveTo(mx, my);
+            this.addCubicBezier([mx, my], [sx, sy], [sx, sy]);
+        }
+        else {
+            this.moveTo(mx, my);
+            this.lineTo(sx, sy);
+        }
         d = this.commandsToString();
         this.setD(d);
         return this;

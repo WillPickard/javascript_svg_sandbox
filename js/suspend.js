@@ -12,6 +12,7 @@ var WINDOW_WIDTH = $(window).width();
 var WINDOW_HEIGHT = $(window).height();
 
 $(document).ready(function(){
+    $("body").css({"overflow-x" : "hidden"});
     main();
 });
 
@@ -24,19 +25,61 @@ function main() {
     var red = new ColorController("red");
 
     PLANE = $plane;
-    var o1 = new OrbController(1, 200, 100, {
+    /***/
+    var o1 = new OrbController(1, 100, 100, {
         "plane": $plane,
-        "colorController": colorController
+        "colorController": colorController,
+        "blurAmount" : 6
     });
+    /**/
+    /**
+    var o2 = new OrbController(100, 20, 20, {
+        "plane" : $plane,
+        "colorController" : green,
+        "blurAmount": 7
+    });
+    var o3 = new OrbController(1, 100, 100, {
+        "plane" : $plane,
+        "colorController" :red,
+        "blurAmount" : 25
+    });
+    var o4 = new OrbController(1, 100, 100, {
+        "plane" : $plane,
+        "colorController" :green
+    });
+    */
+   // o1.build().displayOrbs();
+   // o1.getActuator().slideLeft(o1.getOrbs(), 2000, true);
+    var sun = new Orb(0, {
+        "blurAmount" : 50
+    });
+    sun.setX(50);
+    sun.setY(50);
+    sun.setWidth(500);
+    sun.setHeight(500);
+    sun.setRadius(100);
+    sun.setCircleX(250);
+    sun.setCircleY(250);
+    sun.setColor("yellow");
+    sun.build();
 
-    o1.build().displayOrbs();
-   // o1.getActuator().slideRight(o1.getOrbs(), 5000);
-   // setInterval(function () {
-    //    o1.getActuator().slideRight(o1.getOrbs(), 5000);
-   // }, 5000);
-    $("body").on("click", function(){
-        o1.getActuator().slideRight(o1.getOrbs(), 5000);
+    var particles = [];
+    
+    var particle = new Orb(1, {
+        "blurAmount" : 3
     });
+    particle.setX(50);
+    particle.setY(50);
+    particle.setWidth(100);
+    particle.setHeight(100);
+    particle.setRadius(25);
+    particle.setCircleX(50);
+    particle.setCircleY(50);
+    particle.setColor("white");
+    particle.build();
+
+
+    $plane.append(sun.getElement()).append(particle.getElement());
 
 
 }

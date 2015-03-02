@@ -92,78 +92,138 @@ function Floater(opts){
         }
     };
 
-    this.slideRight = function(orbs, time){
+    this.slideRight = function(orbs, time, loop){
        // this.animations = [];
         for(var i = 0; i < orbs.length; i++) {
-            this.slideOrbRight(orbs[i], time);
+            this.slideOrbRight(orbs[i], time, loop);
         }
     };
 
-    this.slideOrbRight = function(orb, time){
+    this.slideOrbRight = function(orb, time, loop){
+        /*
+        var that = this;
+        orb.getElement().promise().done(function() {
 
-        var dx = this.plane.width() - (orb.getX() + orb.getCircleX()); //side it as far as it can go to the right
+            var dx = that.plane.width() - (orb.getX()); //side it as far as it can go to the right
+            var x = orb.getX();
+
+            var t1 = (dx / that.plane.width()) * time;
+            var t2 = (x / that.plane.width()) * time;
+      //      console.log("moving x from " + x + " to " + (x + dx))
+      //      console.log("first time is " + t1 + " second time is " + t2);
+
+            orb.getElement().animate({
+                "left": "+=" + dx
+            }, t1, "linear", function () {
+                orb.setX("-100");
+            });
+
+            orb.getElement().promise().done(function () {
+//            console.log(orb.getId() + " done");
+                $(this).animate({
+                    "left": x
+                }, t2, "linear", function () {
+                    orb.setX(x);
+
+                });
+            });
+        });
+        */
+        var animation0, animation1;
+
+        var dx = this.plane.width() - (orb.getX()); //side it as far as it can go to the right
         var x = orb.getX();
+
         var t1 = (dx / this.plane.width()) * time;
         var t2 = (x / this.plane.width()) * time;
 
-        console.log("moving x from " + x + " to " + dx);
-        console.log("first time is " + t1 + " second time is " + t2);
-        /*
-         o.getElement().stop(true).delay(200).css("left", "-50px").show(function () {
-         console.log(this);
-         $(this).animate({
-         "left": x
-         }, time);
-         });
-         */
-        orb.getElement().animate({
-            "left": dx
-        }, t1, function(){
+        var  y = orb.getY();
+
+        animation0 = ["+="+dx, y, t1, function(){
             orb.setX("-100");
-        });
-
-        orb.getElement().promise().done(function(){
-            console.log(x);
-            $(this).animate({
-                "left": x
-            }, t2);
-        });
-    };
-
-
-    this.slideLeft = function(orbs, time){
-        for(var i = 0; i < orbs.length; i++) {
-            this.slideOrbLeft(orbs[i], time);
+        }];
+        animation1 = [x, y, t2];
+        orb.addAnimation(animation0);
+        orb.addAnimation(animation1);
+        if(loop){
+            orb.loop();
+        }
+        else {
+            orb.play();
         }
     };
 
-    this.slideOrbLeft = function(orb, time){
 
-        var planeWidth = this.plane.width();
-        var dx = orb.getWidth() - this.plane.width(); //side it as far as it can go to the left
-        var x = orb.getX();
-        var t1 = (Math.abs(dx) / this.plane.width()) * time;
-        var t2 = (x / this.plane.width()) * time;
-        /*
-         o.getElement().stop(true).delay(200).css("left", "-50px").show(function () {
-         console.log(this);
-         $(this).animate({
-         "left": x
-         }, time);
-         });
-         */
-        orb.getElement().animate({
-            "left": dx
-        }, t1, function(){
-            orb.setX(planeWidth);
-        });
-
-        orb.getElement().promise().done(function(){
-            console.log(x);
-            $(this).animate({
-                "left": x
-            }, t2);
-        });
+    this.slideLeft = function(orbs, time, loop){
+        for(var i = 0; i < orbs.length; i++) {
+            this.slideOrbLeft(orbs[i], time, loop);
+        }
     };
+
+    this.slideOrbLeft = function(orb, time, loop){
+        /*
+        var that = this;
+        orb.getElement().promise().done(function() {
+
+            var planeWidth = that.getPlane().width();
+            var dx = (orb.getX() + orb.getWidth()); //side it as far as it can go to the right
+
+            var x = orb.getX();
+
+            var t1 = (dx / that.plane.width()) * time;
+            var t2 = ((planeWidth - x) / that.plane.width()) * time;
+
+            console.log("["+orb.getId()+"] x: " + x + " t2: " + t2 + " | dx: " + dx + " t1: " + t1);
+
+            orb.getElement().animate({
+                "left": "-=" + dx
+            }, t1, "linear", function () {
+                orb.setX(planeWidth + orb.getWidth());
+            });
+
+            orb.getElement().promise().done(function () {
+//            console.log(orb.getId() + " done");
+                $(this).animate({
+                    "left": x
+                }, t2, "linear", function () {
+                    orb.setX(x);
+
+                });
+            });
+        });
+        */
+        var animation0, animation1;
+
+        var planeWidth = this.getPlane().width();
+        var dx = (orb.getX() + orb.getWidth()); //side it as far as it can go to the right
+
+        var x = orb.getX();
+
+        var t1 = (dx / this.plane.width()) * time;
+        var t2 = ((planeWidth - x) / this.plane.width()) * time;
+
+        var  y = orb.getY();
+
+        animation0 = ["-="+dx, y, t1, function(){
+            orb.setX(planeWidth + orb.getWidth());
+        }];
+        animation1 = [x, y, t2, function(){
+            orb.setX(x);
+        }];
+        orb.addAnimation(animation0);
+        orb.addAnimation(animation1);
+        if(loop){
+            orb.loop();
+        }
+        else {
+            orb.play();
+        }
+    };
+
+    this.float = function(orbs){
+
+    };
+
+
 
 }

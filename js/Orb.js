@@ -6,7 +6,7 @@ function Orb(id, opts) {
     this.width = 0;
     this.radius = 0;
     this.color = "#000";
-    this.blurAmount = Math.round(Math.random() + 2) ;
+    this.blurAmount = opts["blurAmount"] ? opts["blurAmount"] : Math.round(Math.random() + 2) ;
 
     this.ele = $("<svg><defs>" +
     "<filter>" +
@@ -20,6 +20,81 @@ function Orb(id, opts) {
     this.blurEffect = $(this.ele).find("feGaussianBlur");
     this.c_x = 0;
     this.c_y = 0;
+
+    this.currentAnimation = 0;
+    this.animations = [];
+    this.intervalId = 0;
+
+    this.addAnimation = function(a){
+        this.animations.push(a);
+        return this;
+    };
+
+    this.setAnimations = function(s){
+        this.animations = s;
+        return this;
+    };
+
+    this.animateStep = function(i){
+        var that = this;
+        if(!i){
+            i = this.currentAnimation;
+            this.currentAnimation++;
+        }
+        if(i < this.animations.length){
+            this.getElement().promise().done(function(){
+                this.animate({
+                    "left" : that.animations[i][0],
+                    "top" : that.animations[i][1]
+                }, that.animations[i][2], "linear", function(){
+                    if(that.animations[i])
+                    {
+                        that.animateStep();
+                    }
+                    if(that.animations[i][3]){
+                        that.animations[i][3]();
+                    }
+                });
+            });
+        }
+    }
+
+    this.play = function(){
+        this.animateStep();
+    };
+
+    this.loop = function(){
+        //compute the total length of each cycle of animations
+       // var time = 0;
+        //for(var i = 0; i < this.animations.length; i++){
+         //   time += this.animations[i][2];
+       // }
+        var that = this;
+        var last = this.animations[this.animations.length - 1];
+        var temp;
+        if(last.length === 4){
+            temp = last[3];
+        }
+        last[3] = function(){
+            if(temp){
+                temp();
+            }
+            that.currentAnimation = 0;
+            that.play();
+        };
+
+        this.play();
+
+        /*var that = this;
+        this.intervalId = setInterval(function(){
+            that.currentAnimation = 0;
+            that.play();
+        }, time);*/
+    };
+
+    this.stop = function(){
+        clearInterval(this.intervalId);
+    };
 
     this.getId = function() {
         return this.id;
@@ -149,7 +224,7 @@ function Orb(id, opts) {
     };
 
     this.showProperties = function(){
-
+        this.getElement().append("<text fill='red'>Test</text>>");
     };
 
     this._init = function() {
