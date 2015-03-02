@@ -34,8 +34,9 @@ function Floater(opts){
     };
 
     this.moveOrb = function(orb, newx, newy, delay){
-        var y = (newy) ? newy : orb.getY() + ((Math.round(Math.random() + 1) * -1) * (Math.random() + 2));
-        var x = newx ? newx : orb.getX() + ((Math.round(Math.random() + 1) * -1) * (Math.random() + 2));
+        var y = (newy) ? newy : orb.getY() + ((Math.round(Math.random() + 1) * -1) * (Math.random()));
+        var x = newx ? newx : orb.getX() + ((Math.round(Math.random() + 1) * -1) * (Math.random()));
+
         orb.getElement().animate({
             "top" :  y + "px",
             "left" : x + "px"
@@ -100,10 +101,13 @@ function Floater(opts){
 
     this.slideOrbRight = function(orb, time){
 
-        var dx = this.plane.width() + orb.getWidth(); //side it as far as it can go to the right
+        var dx = this.plane.width() - (orb.getX() + orb.getCircleX()); //side it as far as it can go to the right
         var x = orb.getX();
         var t1 = (dx / this.plane.width()) * time;
         var t2 = (x / this.plane.width()) * time;
+
+        console.log("moving x from " + x + " to " + dx);
+        console.log("first time is " + t1 + " second time is " + t2);
         /*
          o.getElement().stop(true).delay(200).css("left", "-50px").show(function () {
          console.log(this);

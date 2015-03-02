@@ -148,6 +148,10 @@ function Orb(id, opts) {
         "position" : "absolute"
     };
 
+    this.showProperties = function(){
+
+    };
+
     this._init = function() {
         this.ele.css(base_css);
         this.setId(this.id);

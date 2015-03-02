@@ -15,7 +15,7 @@ $(document).ready(function(){
     main();
 });
 
-function main(){
+function main() {
     $plane = makePlane().appendTo("body");
     var colorController = new ColorController("#ECECEC");
     var purple = new ColorController("#8E44AD");
@@ -24,37 +24,22 @@ function main(){
     var red = new ColorController("red");
 
     PLANE = $plane;
-    var o1 = new OrbController(200, 15, 3, {
-        "plane" : $plane,
-        "colorController" : colorController
+    var o1 = new OrbController(1, 200, 100, {
+        "plane": $plane,
+        "colorController": colorController
     });
-   /**
-    var o2 = new OrbController(ORB_COUNT, MAX_ORB_WIDTH, MIN_ORB_WIDTH, {
-        "plane" : $plane,
-        "colorController" : purple
-    });
-    var o3 = new OrbController(60, 20, 10, {
-        "plane" : $plane,
-        "colorController" : green
-    });
-    var o4 = new OrbController(10, 20, 10, {
-        "plane" : $plane,
-        "colorController" : yellow
-    });
-    var o5 = new OrbController(100, 10, 5, {
-        "plane" : $plane,
-        "colorController" : red
-    });
-**/
+
     o1.build().displayOrbs();
-    o1.pulse(400);
-    setInterval(function(){
-        //o1.getActuator().slideLeft(o1.getOrbs(), 200);
-    }, 200);
+   // o1.getActuator().slideRight(o1.getOrbs(), 5000);
+   // setInterval(function () {
+    //    o1.getActuator().slideRight(o1.getOrbs(), 5000);
+   // }, 5000);
+    $("body").on("click", function(){
+        o1.getActuator().slideRight(o1.getOrbs(), 5000);
+    });
+
+
 }
-
-
-
 function makePlane(){
     var plane = $("<div></div>");
     var css = {
@@ -66,6 +51,8 @@ function makePlane(){
         //"border" : "1px solid red",
         "background": "#000"
     };
+
+    plane.append("<p style='position: absolute; top: 5px; left: 5px; color:red'>Height: " + PLANE_HEIGHT + " width " + PLANE_WIDTH +"</p>")
 
     plane.css(css);
     return plane;
