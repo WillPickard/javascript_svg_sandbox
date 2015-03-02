@@ -40,4 +40,8 @@ function ColorController(color){
         return "rgb(" + r + "," + g + ","+ b+ ")";
       ///  return this.getColor();
     };
+
+    this.colorize = function(orb){
+        orb.setColor(this.getColor());
+    };
 }

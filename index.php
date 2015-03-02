@@ -5,6 +5,7 @@
     <script src="js/Orb.js" type="text/javascript"></script>
     <script src="js/Path.js" type="text/javascript"></script>
     <script src="js/ColorController.js" type="text/javascript"></script>
+    <script src="js/Floater.js" type="text/javascript"></script>
     <script src="js/OrbController.js" type="text/javascript" ></script>
     <script src="js/suspend.js" type="text/javascript" ></script>
 </head>

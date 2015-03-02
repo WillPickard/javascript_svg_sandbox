@@ -137,10 +137,10 @@ function Orb(id, opts) {
     };
 
     this.show = function(){
-        this.getElement().show();
+       return this.getElement().show();
     };
     this.hide = function(){
-        this.getElement().hide();
+        return this.getElement().hide();
     };
 
     //init the orb to default values

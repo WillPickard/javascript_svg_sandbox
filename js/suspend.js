@@ -20,36 +20,39 @@ function main(){
     var colorController = new ColorController("#ECECEC");
     var purple = new ColorController("#8E44AD");
     var green = new ColorController("#1E824C");
+    var yellow = new ColorController("yellow");
+    var red = new ColorController("red");
 
     PLANE = $plane;
-    var o1 = new OrbController(ORB_COUNT, MAX_ORB_WIDTH, MIN_ORB_WIDTH, {
+    var o1 = new OrbController(200, 15, 3, {
         "plane" : $plane,
         "colorController" : colorController
     });
+   /**
     var o2 = new OrbController(ORB_COUNT, MAX_ORB_WIDTH, MIN_ORB_WIDTH, {
         "plane" : $plane,
         "colorController" : purple
     });
-    var o3 = new OrbController(ORB_COUNT, MAX_ORB_WIDTH, MIN_ORB_WIDTH, {
+    var o3 = new OrbController(60, 20, 10, {
         "plane" : $plane,
         "colorController" : green
     });
-    o1.randomizeAll().displayOrbs().pulse(2000);
-    o2.randomizeAll().displayOrbs().pulse(2000);
-    o3.randomizeAll().displayOrbs().pulse(2000);
-
+    var o4 = new OrbController(10, 20, 10, {
+        "plane" : $plane,
+        "colorController" : yellow
+    });
+    var o5 = new OrbController(100, 10, 5, {
+        "plane" : $plane,
+        "colorController" : red
+    });
+**/
+    o1.build().displayOrbs();
+    o1.pulse(400);
     setInterval(function(){
-        o1.erratic(o1.getRandomOrb());
-        o2.erratic(o2.getRandomOrb());
-        o3.erratic(o3.getRandomOrb());
-    }, 3000);
-
-
-
-
-
-
+        //o1.getActuator().slideLeft(o1.getOrbs(), 200);
+    }, 200);
 }
+
 
 
 function makePlane(){
@@ -61,7 +64,7 @@ function makePlane(){
         "left" : (WINDOW_WIDTH - PLANE_WIDTH) / 2,
         "top" : (WINDOW_HEIGHT - PLANE_HEIGHT) / 2,
         //"border" : "1px solid red",
-        "background": "#333"
+        "background": "#000"
     };
 
     plane.css(css);

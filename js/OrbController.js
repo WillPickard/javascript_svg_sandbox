@@ -74,6 +74,13 @@ function OrbController(numOrbs, max, min, opts)
           orb.getElement().hide();
     };
 
+    this.getActuator = function() {
+        return this.actuator;
+    };
+    this.setActuator = function(s){
+        this.actuator = s;
+    };
+
     this.addOrb = function(orb){
         this.orbs.push(orb);
         this.numOrbs = this.orbs.length;
@@ -81,10 +88,11 @@ function OrbController(numOrbs, max, min, opts)
 
     //delete all orbs
     this.clear = function(){
-        for(var i = 0; i < this.count(); i++){
+        for(var i = 0; i < this.orbs.length; i++){
             this.remove(this.orbs[i]);
         }
         this.orbCount = this.orbs.length;
+        this.paths = [];
     };
     this.remove = function(orb) {
         var id = orb.getId(); //index into the orbs array
@@ -94,41 +102,6 @@ function OrbController(numOrbs, max, min, opts)
         return deleted[0];
     };
 
-    this.randomizeAll = function(){
-        for(var i = 0; i < this.count(); i++) {
-            this.randomize(this.orbs[i]);
-        }
-
-       return this.buildPaths();
-    };
-
-    this.randomize = function(orb){
-        var s = Math.floor(Math.random() * this.getMaxOrbSize()) + this.getMinOrbSize();
-
-        //planeWidth defines the upperBound on what we can set the x value of the orb to
-        var planeWidth = this.getPlane().width();
-        //planeHeight defines the upperbound on what we can set the y value of the orb to
-        var planeHeight = this.getPlane().height();
-
-        var c = s / 2;//center
-        var r = c / 2;//radius
-
-        var color = this.getColorController().getColor();
-        //r defines a further bound on the position values
-        //the orb cannot be within its radius to a wall
-        var x = Math.floor(Math.random() * (planeWidth - (c + r))) - Math.round(Math.random()) * r;
-        var y = Math.floor(Math.random() * (planeHeight - (c + r))) - Math.round(Math.random()) * r;
-
-        orb.setHeight(s);
-        orb.setWidth(s);
-        orb.setRadius(r);
-        orb.setCircleX(c);
-        orb.setCircleY(c);
-        orb.setColor(color);
-        orb.setX(x);
-        orb.setY(y);
-        return orb;
-    };
 
     this.getPaths = function(){
         return this.paths;
@@ -146,7 +119,7 @@ function OrbController(numOrbs, max, min, opts)
     this.makePath = function(o1, o2){
         return new Path(o1, o2, {
             "plane": this.getPlane(),
-            "stroke-width" : "2",
+            "stroke-width" : "1",
             "stroke" : "red"
         });
     };
@@ -185,19 +158,28 @@ function OrbController(numOrbs, max, min, opts)
         path.build().display();
         return this;
     };
-    this._init = function(){
+
+
+    this.build = function(){
         this.setMaxOrbSize(this.getMaxOrbSize());
         this.setMinOrbSize(this.getMinOrbSize());
 
-        for(var i = 0; i < this.count(); i++){
+        this.clear();
+
+        for(var i = 0; i < this.count(); i++) {
             var orb = new Orb(i, {});
+            this.actuator.placeOrb(orb);
+            this.getColorController().colorize(orb);
             this.orbs.push(orb);
         }
+
+        return this;
     };
+
 
     this.pulse = function(delay){
         var that = this;
-        var intervalID = setInterval(function(){ that.moveAll(); }, delay);
+        var intervalID = setInterval(function(){ that.getActuator().moveOrbs(that.getOrbs()); }, delay);
         return intervalID;
     };
     this.animateColors = function(delay){
@@ -217,52 +199,6 @@ function OrbController(numOrbs, max, min, opts)
             }
         }, delay);
     };
-    this.moveAll = function(){
-       // console.log("moveAll");
-        for(var i = 0; i < this.orbs.length; i++){
-            this.moveOrb(this.orbs[i]);
-        }
-    };
-    this.moveOrb = function(orb, newx, newy){
-        var that = this;
-        var y = (newy) ? newy : orb.getY() + ((Math.round(Math.random() + 1) * -1) * (Math.random() + 2));
-        var x = newx ? newx : orb.getX() + ((Math.round(Math.random() + 1) * -1) * (Math.random() + 2));
-        orb.getElement().animate({
-            "top" :  y + "px",
-            "left" : x + "px"
-        }, 2000, "linear", function(){
-           // console.log(orb.getId() + " complete animation");
-            orb.setX(x);
-            orb.setY(y);
-            that.updatePaths(orb.getId());
-        });
-    };
-
-    this.erratic = function(orb){
-        if(!orb){
-            orb = this.getRandomOrb();
-        }
-
-        //roll the dice
-        var roll = Math.floor(Math.random() * 100);
-        if(roll <= 30){
-            //30% of the time
-            var planeWidth = this.getPlane().width();
-            var planeHeight = this.getPlane().height();
-            var color = this.getColorController().make();
-            //r defines a further bound on the position values
-            //the orb cannot be within its radius to a wall
-            var s = orb.getHeight() * 2;
-            var r = s/4;
-            var c = s/2;
-            var x = Math.floor(Math.random() * (planeWidth - (c + r))) - Math.round(Math.random()) * r;
-            var y = Math.floor(Math.random() * (planeHeight - (c + r))) - Math.round(Math.random()) * r;
-            orb.hide();
-            orb.setCircleX(c).setCircleY(c).setRadius(r).setHeight(s).setWidth(s);
-            orb.show();
-            this.moveOrb(orb, x, y);
-        }
-    };
 
     this.getRandomOrb = function(){
         return this.orbs[Math.floor(Math.random() * this.orbs.length)];
@@ -271,6 +207,7 @@ function OrbController(numOrbs, max, min, opts)
     this.movePath = function(path){
 
     };
+
     this.numOrbs = numOrbs;
     this.orbs = [];
     this.maxOrbSize = max;
@@ -278,6 +215,10 @@ function OrbController(numOrbs, max, min, opts)
     this.paths = opts["paths"] ? opts["paths"] : [];
     this.plane = (opts["plane"]) ? opts["plane"] : $("body");
     this.colorController = (opts["colorController"]) ? opts["colorController"] : this._colorController();
-
-    this._init();
+    this.actuator =  opts["actuator"] ? opts["actuator"] : new Floater({
+        "plane" : this.getPlane(),
+        "orbs" : this.getOrbs(),
+        "max" : this.getMaxOrbSize(),
+        "min" : this.getMinOrbSize()
+    });
 }//OrbController Class
