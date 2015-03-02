@@ -1,4 +1,4 @@
-function Orb(id, opts) {
+function Orb(id, plane, opts) {
     this.id = id;
     this.x = 0;
     this.y = 0;
@@ -7,16 +7,19 @@ function Orb(id, opts) {
     this.width = 0;
     this.radius = 0;
     this.color = "#000";
+    this.plane = plane;
     this.blurAmount = opts["blurAmount"] ? opts["blurAmount"] : Math.round(Math.random() + 2) ;
-
+/*
     this.ele = $("<svg><defs>" +
     "<filter>" +
-    "<feGaussianBlur />" +
+    "<feGaussianBlur />" +;
     "</filter>"+
     "</defs>" +
     "<circle />" +
     "</svg>");
-    this.circle = $(this.ele).find("circle");
+    */
+    this.ele = $(document.createElementNS("http://www.w3.org/2000/svg", "circle"));
+    this.circle = this.ele;//$(this.ele).find("circle");
     this.filter = $(this.ele).find("filter");
     this.blurEffect = $(this.ele).find("feGaussianBlur");
     this.c_x = 0;
@@ -98,7 +101,7 @@ function Orb(id, opts) {
 
     this.setZ = function(z){
         this.z = z;
-        this.getElement().css({"z-index":z});
+       // this.getElement().css({"z-index":z});
         return this;
     };
     this.getZ = function(z){
@@ -110,8 +113,8 @@ function Orb(id, opts) {
     };
     this.setId = function(d) {
         this.id = d;
-        this.filter.attr("id", "orbfilter_" + d);
-        this.circle.attr("filter", "url(#orbfilter_" + id + ")");
+       // this.filter.attr("id", "orbfilter_" + d);
+       // this.circle.attr("filter", "url(#orbfilter_" + id + ")");
         return this;
     };
 
@@ -120,7 +123,7 @@ function Orb(id, opts) {
     };
     this.setX = function (x) {
         this.x = x;
-        this.ele.css({"left" : x + "px"});
+        this.ele.attr("x", x );
         return this;
     };
 
@@ -129,7 +132,7 @@ function Orb(id, opts) {
     };
     this.setY = function (y) {
         this.y = y;
-        this.ele.css({"top" : y + "px"});
+        this.ele.attr("y", y);
         return this;
     };
 
@@ -177,8 +180,8 @@ function Orb(id, opts) {
         return this.blurAmount;
     };
     this.setBlurAmount = function(i) {
-        this.blurAmount = i;
-        this.blurEffect[0].setAttribute("stdDeviation", i);
+       // this.blurAmount = i;
+       // this.blurEffect[0].setAttribute("stdDeviation", i);
         return this;
     };
 
@@ -237,17 +240,17 @@ function Orb(id, opts) {
     };
 
     this._init = function() {
-        this.ele.css(base_css);
+      //  this.ele.css(base_css);
         this.setId(this.id);
-        this.setX(this.x);
-        this.setY(this.y);
-        this.setWidth(this.width);
-        this.setHeight(this.height);
+        //this.setX(this.x);
+       // this.setY(this.y);
+      //  this.setWidth(this.width);
+      //  this.setHeight(this.height);
         this.setColor(this.color);
         this.setRadius(this.radius);
-        this.filter.attr("height", "200%").attr("width", "200%").attr("x", "-50%").attr("y", "-50%");
-        this.blurEffect.attr("in", "SourceGraphic");
-        this.setBlurAmount(this.blurAmount);
+        //this.filter.attr("height", "200%").attr("width", "200%").attr("x", "-50%").attr("y", "-50%");
+        //this.blurEffect.attr("in", "SourceGraphic");
+        //this.setBlurAmount(this.blurAmount);
     };
     this._init();
 }//Orb class

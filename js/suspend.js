@@ -18,6 +18,8 @@ $(document).ready(function(){
 
 function main() {
     $plane = makePlane().appendTo("body");
+   // $("body").append("<svg height='100' width='100'></svg>");
+    /**/
     var colorController = new ColorController("#ECECEC");
     var purple = new ColorController("#8E44AD");
     var green = new ColorController("#1E824C");
@@ -26,119 +28,89 @@ function main() {
 
     PLANE = $plane;
     /***/
+    /*
     var o1 = new OrbController(1, 100, 100, {
         "plane": $plane,
         "colorController": colorController,
         "blurAmount" : 6
     });
-    /**/
-    /**
-    var o2 = new OrbController(100, 20, 20, {
-        "plane" : $plane,
-        "colorController" : green,
-        "blurAmount": 7
-    });
-    var o3 = new OrbController(1, 100, 100, {
-        "plane" : $plane,
-        "colorController" :red,
-        "blurAmount" : 25
-    });
-    var o4 = new OrbController(1, 100, 100, {
-        "plane" : $plane,
-        "colorController" :green
-    });
-    */
-   // o1.build().displayOrbs();
-   // o1.getActuator().slideLeft(o1.getOrbs(), 2000, true);
-    var sun = new Orb(0, {
+*/
+    var sun = new Orb(0, $plane, {
         "blurAmount" : 50
     });
-    sun.setX($plane.width()/2 - 250);
-    sun.setY($plane.height()/2 - 250);
-    sun.setWidth(500);
-    sun.setHeight(500);
+
+  //  sun.setX($plane.width()/2 - 250);
+  //  sun.setY($plane.height()/2 - 250);
+    //sun.setWidth(500);
+    //sun.setHeight(500);
     sun.setRadius(100);
     sun.setCircleX(250);
     sun.setCircleY(250);
     sun.setColor("yellow");
     sun.build();
 
+    $plane.append(sun.getElement());
+
+    var bX = sun.getCircleX();
+    var bY = sun.getCircleY();
     var particles = [];
 
-    for(var i = 0; i < 4; i++){
-        var particle = new Orb(1, {
-            "blurAmount" : 3
-        });
-       // particle.setX(50);
-     //   particle.setY(50);
-        particle.setWidth(100);
-        particle.setHeight(100);
-        particle.setRadius(25);
-        particle.setCircleX(50);
-        particle.setCircleY(50);
-        particle.setColor("white");
-        particle.build();
+    for(var i = 0; i < 1; i++){
+        var particle = new Orb(i, $plane, {"color" : "white"});
+      //  particle.setX(bX);
+     //   particle.setY(bY - 200);
+      //  particle.setHeight(30);
+      //  particle.setWidth(30);
+        particle.setCircleX(15);
+        particle.setCircleY(15);
+        particle.setRadius(5);
+        particle.setColor("black");
+
         particles.push(particle);
     }
-    $plane.append(sun.getElement());//.append(particle.getElement());
 
-    var sunCenter = sun.getCenter();
-    var x = sunCenter[0] + sun.getX();
-    var y = sunCenter[1] + sun.getY();
-    var baseX = x - 50;
-    var baseY = y - 50;
+    var endpoint = new Orb(2, $plane, {});
+    //endpoint.setX(bX);
+   // endpoint.setY(bY + 200);
+   // endpoint.setHeight(30);
+   // endpoint.setWidth(30);
+    endpoint.setCircleX(200);
+    endpoint.setCircleY(200);
+    endpoint.setRadius(5);
+    endpoint.setColor("red");
 
-    particles[0].setX(baseX).setY(Math.abs(baseY - 250));
-    particles[1].setX(baseX + 250).setY(baseY);
-    particles[2].setX(baseX).setY(baseY + 250);
-    particles[3].setX(baseX - 250).setY(baseY);
+    $plane.append(particles[0].getElement())
+    $plane.append(endpoint.getElement());
 
-    var a0 = [{
-        "top": "+=" + (baseY + 250),
-        "opacity" : 0
-    }, 1000];
-    var a1 = [{
-        "top":  (baseY - 250),
-        "opacity" : 1
-    }, 1000];
-    particles[0].addAnimation(a0);
-    particles[0].addAnimation(a1);
-    particles[0].setZ(100);
-    for(var i = 0; i < particles.length; i++){
-        $plane.append(particles[i].getElement());
-    }
-   // particles[0].loop();
+    var path = new Path(particles[0], endpoint, {"stroke" : "green", "plane" : $plane, "stroke-width" : 2});
+    path.path.attr("id", "motionPath");
+    path.build().display();
 
-    sun.setZ("1");
-    var clicked = false;
-    $("body").click(function(){
-        if(clicked){
-            clicked = false;
-            particles[0].stop();
-        }
-        else {
-            clicked = true;
-            particles[0].loop();
-        }
-    })
+    var animation = document.createElementNS('http://www.w3.org/2000/svg', "animateMotion");
+    var mpath = document.createElementNS('http://www.w3.org/2000/svg', "mpath");
 
-
+    animation.setAttribute("dur", "6s");
+    animation.setAttribute("repeatCount", "indefinite");
+    mpath.setAttributeNS("http://www.w3.org/1999/xlink", "href", "#motionPath");
+    animation.appendChild(mpath);
+    particles[0].getElement().append(animation);
+   // particles[0].getElement().append('<animateMotion dur="6s" repeatCount="indefinite"> <mpath xlink:href="#motionPath"/> </animateMotion>');
+/**/
 }
 function makePlane(){
-    var plane = $("<div></div>");
+    var plane = $("<svg height='" + PLANE_HEIGHT + "' width='" + PLANE_WIDTH +"' xmlns='http://www.w3.org/2000/svg'></svg>");
     var css = {
-        "height" : PLANE_HEIGHT + "px",
-        "width" : PLANE_WIDTH + "px",
         "position" : "absolute",
         "left" : (WINDOW_WIDTH - PLANE_WIDTH) / 2,
-        "top" : (WINDOW_HEIGHT - PLANE_HEIGHT) / 2,
-        //"border" : "1px solid red",
-        "background": "#000"
+        "top" : (WINDOW_HEIGHT - PLANE_HEIGHT) / 2
     };
 
-    plane.append("<p style='position: absolute; top: 5px; left: 5px; color:red'>Height: " + PLANE_HEIGHT + " width " + PLANE_WIDTH +"</p>")
+   // plane.attr("width", PLANE_WIDTH);
+  //  plane.attr("height", PLANE_HEIGHT);
 
-    plane.css(css);
+    //plane.append("<p style='position: absolute; top: 5px; left: 5px; color:red'>Height: " + PLANE_HEIGHT + " width " + PLANE_WIDTH +"</p>")
+
+   // plane.css(css);
     return plane;
 }
 

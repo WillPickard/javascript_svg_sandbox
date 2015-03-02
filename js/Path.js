@@ -3,8 +3,8 @@ function Path(o1, o2, opt)
 {
     this.master = o1;
     this.slave = o2;
-    this.ele = $("<svg><path /></svg>");
-    this.path = this.ele.find("path");
+    this.ele = $(document.createElementNS("http://www.w3.org/2000/svg", "path"));
+    this.path = this.ele;//.find("path");
     this.stroke = opt["stroke"] ? opt["stroke"] : "#000";
     this.fill = opt["transparent"] ? opt["fill"] : "transparent";
     this.plane = opt["plane"] ? opt["plane"] : "BODY";
@@ -226,6 +226,7 @@ function Path(o1, o2, opt)
         return this;
     };
     this._init = function(){
+     /*
         this.ele.css({
             "height" : this.getPlane().height() + "px",
             "width" : this.getPlane().width() + "px",
@@ -233,6 +234,7 @@ function Path(o1, o2, opt)
             "top": 0,
             "left": 0
         });
+        */
         return this.build();
     };
     this._init();
