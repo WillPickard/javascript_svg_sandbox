@@ -69,21 +69,15 @@ function Floater(opts){
         var c = s / 2;//center
         var r = c / 2;//radius
 
-      //  var color = this.getColorController().getColor();
         //r defines a further bound on the position values
         //the orb cannot be within its radius to a wall
         var x = Math.floor(Math.random() * planeWidth) ;
         var y = Math.floor(Math.random() * planeHeight);
-         //   console.log("planeWidth: " + planeWidth + " planeHeight : " + planeHeight + " c: " + c + " r: " + r);
-       // console.log(x + ", " + y);
-      //  orb.setHeight(s);
-      //  orb.setWidth(s);
+
         orb.setRadius(r);
-        orb.setCircleX(x);
-        orb.setCircleY(y);
-      //  orb.setColor(color);
-      //  orb.setX(x);
-      //  orb.setY(y);
+        orb.setX(x);
+        orb.setY(y);
+
         return orb;
     };
 
@@ -104,19 +98,18 @@ function Floater(opts){
         var maxX = this.plane.attr("width");
         var minX = 0;
         var center = orb.getCenter();
-        var path = new Path(null, null, {"stroke" : "red", "stroke-width" : "0", "plane" : this.plane});
+        var path = new Path({"stroke" : "red", "stroke-width" : "0", "plane" : this.plane});
         path.moveTo(center[0], center[1]);
         path.lineTo(maxX, center[1]);
         path.moveTo(minX, center[1]);
         path.lineTo(center[0], center[1]);
 
         orb.hide();
-        orb.setCircleX("").setCircleY("");
+        orb.setX("").setY("");
         orb.show();
 
         path.path.attr("id", "motionPath-"+orb.getId());
-        path.build().display();
-
+        path.build().display()
 
         var a = new Animation({
             "tag" : "animateMotion",
@@ -141,14 +134,14 @@ function Floater(opts){
         var maxX = this.plane.attr("width");
         var minX = 0;
         var center = orb.getCenter();
-        var path = new Path(null, null, {"stroke" : "red", "stroke-width" : "0", "plane" : this.plane});
+        var path = new Path({"stroke" : "red", "stroke-width" : "0", "plane" : this.plane});
         path.moveTo(center[0], center[1]);
         path.lineTo(minX, center[1]);
         path.moveTo(maxX, center[1]);
         path.lineTo(center[0], center[1]);
 
         orb.hide();
-        orb.setCircleX("").setCircleY("");
+        orb.setX("").setY("");
         orb.show();
 
         var unique = new Date().getTime();

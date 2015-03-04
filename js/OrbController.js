@@ -123,12 +123,20 @@ function OrbController(numOrbs, max, min, opts)
         }
         this.paths[index].push(path);
     };
-    this.makePath = function(o1, o2){
-        return new Path(o1, o2, {
+    this.connectOrbs = function(o1, o2){
+        var path = new Path({
             "plane": this.getPlane(),
             "stroke-width" : "1",
             "stroke" : "red"
         });
+        //build it with the master and slave
+        var mCenter = o1.getCenter();
+        var sCenter = o2.getCenter();
+
+        path.moveTo(mCenter[0], mCenter[1]);
+        path.lineTo(sCenter[0], sCenter[1]);
+        path.build();
+        return path;
     };
     this.buildPaths = function(){
         //connect all the orb's centers with a path
@@ -137,7 +145,7 @@ function OrbController(numOrbs, max, min, opts)
             master = this.orbs[i];
             for(var j = (i + 1); j < this.count(); j++){
                 slave = this.orbs[j];
-                var path = this.makePath(master, slave);
+                var path = this.connectOrbs(master, slave);
                 this.addPath(i, path);
             }
         }
@@ -207,7 +215,7 @@ function OrbController(numOrbs, max, min, opts)
         for(var i = 0; i < this.orbs.length; i++){
             var orb = this.orbs[i];
             var center = orb.getCenter();
-            var path1 = new Path(null, null, {"stroke" : "red", "stroke-width" : "0", "plane" : this.plane});
+            var path1 = new Path({"stroke" : "red", "stroke-width" : "0", "plane" : this.plane});
             path1.moveTo(center[0], center[1]);
         //    path1.addCubicBezier(center, [maxX/2, center[1]/2], [maxX, center[1]]);
             path1.lineTo(maxX, center[1]);

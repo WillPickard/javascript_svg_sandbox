@@ -1,8 +1,8 @@
 //path between two orbs
-function Path(o1, o2, opt)
+function Path(opt)
 {
-    this.master = o1;
-    this.slave = o2;
+    //this.master = o1;
+    //this.slave = o2;
     this.ele = $(document.createElementNS("http://www.w3.org/2000/svg", "path"));
     this.path = this.ele;//.find("path");
     this.stroke = opt["stroke"] ? opt["stroke"] : "#000";
@@ -14,19 +14,6 @@ function Path(o1, o2, opt)
     this.useBezier = opt["useBezier"] ? opt["useBezier"] : false;
     this.strokeWidth = opt["stroke-width"] ? opt["stroke-width"] : "5";
 
-    this.getMaster = function(){
-        return this.master;
-    };
-    this.setMaster = function(m){
-        this.master = m;
-    };
-
-    this.getSlave = function(){
-        return this.slave;
-    };
-    this.setSlave = function(s){
-        this.slave = s;
-    };
 
     this.getOrigin = function(){
         return this.origin;
@@ -131,7 +118,7 @@ function Path(o1, o2, opt)
     this.update = function(){
         this.commands = [];
         this.setD("");
-        this.buildConnection();
+       // this.buildConnection();
         return this;
     };
 

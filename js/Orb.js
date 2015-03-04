@@ -8,12 +8,15 @@ function Orb(id, plane, opts) {
     this.animations = opts["animations"] ? opts["animations"] : [];
     this.element = document.createElementNS("http://www.w3.org/2000/svg", "circle");
     //this.circle = this.elemenet;//$(this.ele).find("circle");
-    this.filter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
-    this.blurEffect = document.createElementNS("http://www.w3.org/2000/svg","feGaussianBlur");
-   // this.element.appendChild(this.filter);
-    this.filter.appendChild(this.blurEffect);
-    this.c_x = 0;
-    this.c_y = 0;
+    this.withFilter = opts["withFilter"] === false ? opts["withFilter"] : true;
+
+    if(this.withFilter) {
+        this.filter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
+        this.blurEffect = document.createElementNS("http://www.w3.org/2000/svg", "feGaussianBlur");
+        // this.element.appendChild(this.filter);
+        this.filter.appendChild(this.blurEffect);
+    }
+
     this.currentAnimation = 0;
     this.animations = [];
     this.intervalId = 0;
@@ -116,7 +119,7 @@ function Orb(id, plane, opts) {
     };
     this.setX = function (x) {
         this.x = x;
-        this.ele.attr("x", x );
+        this.element.setAttribute("cx", x);
         return this;
     };
 
@@ -125,30 +128,13 @@ function Orb(id, plane, opts) {
     };
     this.setY = function (y) {
         this.y = y;
-        this.ele.attr("y", y);
-        return this;
-    };
-
-    this.getCircleX = function() {
-        return this.c_x;
-    };
-    this.setCircleX = function(x) {
-        this.c_x = x;
-        this.element.setAttribute("cx", x);
-        return this;
-    };
-
-    this.getCircleY = function() {
-        return this.c_y;
-    };
-    this.setCircleY = function(y) {
-        this.c_y = y;
         this.element.setAttribute("cy", y);
         return this;
     };
 
+
     this.getCenter = function(){
-        return [this.getCircleX(), this.getCircleY()];
+        return [this.getX(), this.getY()];
     };
 
     this.getHeight = function () {
@@ -238,17 +224,19 @@ function Orb(id, plane, opts) {
         this.setColor(this.color);
         this.setRadius(this.radius);
 
-        this.filter.setAttribute("height", "200%");
-        this.filter.setAttribute("width", "200%");
-        this.filter.setAttribute("x", "-50%")
-        this.filter.setAttribute("y", "-50%");
+        if(this.withFilter) {
+            this.filter.setAttribute("height", "200%");
+            this.filter.setAttribute("width", "200%");
+            this.filter.setAttribute("x", "-50%")
+            this.filter.setAttribute("y", "-50%");
 
-        this.blurEffect.setAttribute("in", "SourceGraphic");
-        this.setBlurAmount(this.blurAmount);
-        var timestamp = Math.round(new Date().getTime() * Math.random());
-        var id = "filter-" + timestamp;
-        this.element.setAttribute("filter", "url(#"+id+")");
-        this.filter.setAttribute("id", id)
+            this.blurEffect.setAttribute("in", "SourceGraphic");
+            this.setBlurAmount(this.blurAmount);
+            var timestamp = Math.round(new Date().getTime() * Math.random());
+            var id = "filter-" + timestamp;
+            this.element.setAttribute("filter", "url(#" + id + ")");
+            this.filter.setAttribute("id", id)
+        }
     };
     this._init();
 }//Orb class
