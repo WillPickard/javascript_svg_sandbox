@@ -237,5 +237,5 @@ function Path(o1, o2, opt)
         */
         return this.build();
     };
-    this._init();
+  //  this._init();
 }

@@ -63,6 +63,13 @@ function OrbController(numOrbs, max, min, opts)
     };
     this.display = function(orb){
         this.getPlane().append(orb.getElement());
+
+        if(!this.defs){
+            this.defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+            this.getPlane()[0].appendChild(this.defs);
+        }
+
+        this.defs.appendChild(orb.getFilter());
     };
 
     this.hideAll = function(){
@@ -167,7 +174,7 @@ function OrbController(numOrbs, max, min, opts)
         this.clear();
 
         for(var i = 0; i < this.count(); i++) {
-            var orb = new Orb(i, {
+            var orb = new Orb(i, this.plane, {
                 "blurAmount" : this.blurAmount
             });
             this.actuator.placeOrb(orb);
@@ -180,26 +187,10 @@ function OrbController(numOrbs, max, min, opts)
 
 
     this.pulse = function(delay){
-        var that = this;
-        var intervalID = setInterval(function(){ that.getActuator().moveOrbs(that.getOrbs()); }, delay);
-        return intervalID;
+
     };
     this.animateColors = function(delay){
-        var that = this;
-        var intervalID = setInterval(function(){
-            for(var i = 0; i < that.orbs.length; i++){
-                var orb = that.orbs[i];
-                var color = that.getColorController().make(orb.getColor());
 
-                //console.log(color);
-               // var a = "<animate attributeName='fill' from='" + orb.getColor() + "' to='" + color + "' dur='200ms' repeatCount=1 />";
-               // orb.getCircle().find("animate").remove();
-                orb.setColor(color);
-               // orb.setBlurAmount(orb.getBlurAmount() + (Math.pow(-1, Math.round(Math.random() + 2)) * (Math.random() * 2)));
-
-               // orb.getCircle().append(a)
-            }
-        }, delay);
     };
 
     this.getRandomOrb = function(){
@@ -208,6 +199,47 @@ function OrbController(numOrbs, max, min, opts)
 
     this.movePath = function(path){
 
+    };
+
+    this.test = function(){
+        var maxX = this.plane.attr("width");
+        var minX = 0;
+        for(var i = 0; i < this.orbs.length; i++){
+            var orb = this.orbs[i];
+            var center = orb.getCenter();
+            var path1 = new Path(null, null, {"stroke" : "red", "stroke-width" : "0", "plane" : this.plane});
+            path1.moveTo(center[0], center[1]);
+        //    path1.addCubicBezier(center, [maxX/2, center[1]/2], [maxX, center[1]]);
+            path1.lineTo(maxX, center[1]);
+
+            path1.moveTo(minX, center[1]);
+            path1.lineTo(center[0], center[1]);
+
+            orb.hide();
+            orb.setCircleX("").setCircleY("");
+            orb.show();
+
+
+
+            path1.path.attr("id", "motionPath-"+orb.getId());
+            path1.build().display();
+
+            var maxT = 6;
+            var t1 = (maxX - center[0]) / maxX ;
+            var t2 = center[0] / maxX;
+
+            var test = new Animation({
+                "tag" : "animateMotion",
+                "dur" : "6s",
+                "repeatCount" : "indefinite",
+                "parent" : orb.getElement()[0]
+            });
+            var mpath = test.makeElement("mpath");
+            test.setAttributeNameSpace(mpath, "href", "#motionPath-"+orb.getId());
+            test.addChild(mpath);
+            test.display()
+
+        }
     };
 
 

@@ -62,9 +62,9 @@ function Floater(opts){
         var s = Math.floor(Math.random() * max) + min;
 
         //planeWidth defines the upperBound on what we can set the x value of the orb to
-        var planeWidth = this.getPlane().width();
+        var planeWidth = this.getPlane().attr("width");
         //planeHeight defines the upperbound on what we can set the y value of the orb to
-        var planeHeight = this.getPlane().height();
+        var planeHeight = this.getPlane().attr("height");
 
         var c = s / 2;//center
         var r = c / 2;//radius
@@ -72,17 +72,18 @@ function Floater(opts){
       //  var color = this.getColorController().getColor();
         //r defines a further bound on the position values
         //the orb cannot be within its radius to a wall
-        var x = Math.floor(Math.random() * (planeWidth - (c + r))) - Math.round(Math.random()) * r;
-        var y = Math.floor(Math.random() * (planeHeight - (c + r))) - Math.round(Math.random()) * r;
-
-        orb.setHeight(s);
-        orb.setWidth(s);
+        var x = Math.floor(Math.random() * planeWidth) ;
+        var y = Math.floor(Math.random() * planeHeight);
+         //   console.log("planeWidth: " + planeWidth + " planeHeight : " + planeHeight + " c: " + c + " r: " + r);
+       // console.log(x + ", " + y);
+      //  orb.setHeight(s);
+      //  orb.setWidth(s);
         orb.setRadius(r);
-        orb.setCircleX(c);
-        orb.setCircleY(c);
+        orb.setCircleX(x);
+        orb.setCircleY(y);
       //  orb.setColor(color);
-        orb.setX(x);
-        orb.setY(y);
+      //  orb.setX(x);
+      //  orb.setY(y);
         return orb;
     };
 
@@ -100,63 +101,33 @@ function Floater(opts){
     };
 
     this.slideOrbRight = function(orb, time, loop){
-        /*
-        var that = this;
-        orb.getElement().promise().done(function() {
+        var maxX = this.plane.attr("width");
+        var minX = 0;
+        var center = orb.getCenter();
+        var path = new Path(null, null, {"stroke" : "red", "stroke-width" : "0", "plane" : this.plane});
+        path.moveTo(center[0], center[1]);
+        path.lineTo(maxX, center[1]);
+        path.moveTo(minX, center[1]);
+        path.lineTo(center[0], center[1]);
 
-            var dx = that.plane.width() - (orb.getX()); //side it as far as it can go to the right
-            var x = orb.getX();
+        orb.hide();
+        orb.setCircleX("").setCircleY("");
+        orb.show();
 
-            var t1 = (dx / that.plane.width()) * time;
-            var t2 = (x / that.plane.width()) * time;
-      //      console.log("moving x from " + x + " to " + (x + dx))
-      //      console.log("first time is " + t1 + " second time is " + t2);
+        path.path.attr("id", "motionPath-"+orb.getId());
+        path.build().display();
 
-            orb.getElement().animate({
-                "left": "+=" + dx
-            }, t1, "linear", function () {
-                orb.setX("-100");
-            });
 
-            orb.getElement().promise().done(function () {
-//            console.log(orb.getId() + " done");
-                $(this).animate({
-                    "left": x
-                }, t2, "linear", function () {
-                    orb.setX(x);
-
-                });
-            });
+        var a = new Animation({
+            "tag" : "animateMotion",
+            "dur" : time,
+            "repeatCount" : loop ? "indefinite" : 1,
+            "parent" : orb.getElement()
         });
-        */
-        var animation0, animation1;
-
-        var dx = this.plane.width() - (orb.getX()); //side it as far as it can go to the right
-        var x = orb.getX();
-
-        var t1 = (dx / this.plane.width()) * time;
-        var t2 = (x / this.plane.width()) * time;
-
-        var  y = orb.getY();
-
-        animation0 = [{
-            "left" : "+="+dx,
-            "top" : y
-        }, t1, function(){
-            orb.setX("-100");
-        }];
-        animation1 = [{
-            "left" : x,
-            "top" : y
-        }, t2];
-        orb.addAnimation(animation0);
-        orb.addAnimation(animation1);
-        if(loop){
-            orb.loop();
-        }
-        else {
-            orb.play();
-        }
+        var mpath = a.makeElement("mpath");
+        a.setAttributeNameSpace(mpath, "href", "#motionPath-"+orb.getId());
+        a.addChild(mpath);
+        a.display();
     };
 
 
@@ -167,70 +138,37 @@ function Floater(opts){
     };
 
     this.slideOrbLeft = function(orb, time, loop){
-        /*
-        var that = this;
-        orb.getElement().promise().done(function() {
+        var maxX = this.plane.attr("width");
+        var minX = 0;
+        var center = orb.getCenter();
+        var path = new Path(null, null, {"stroke" : "red", "stroke-width" : "0", "plane" : this.plane});
+        path.moveTo(center[0], center[1]);
+        path.lineTo(minX, center[1]);
+        path.moveTo(maxX, center[1]);
+        path.lineTo(center[0], center[1]);
 
-            var planeWidth = that.getPlane().width();
-            var dx = (orb.getX() + orb.getWidth()); //side it as far as it can go to the right
+        orb.hide();
+        orb.setCircleX("").setCircleY("");
+        orb.show();
 
-            var x = orb.getX();
+        var unique = new Date().getTime();
+        path.path.attr("id", "motionPath-"+unique);
+        path.build().display();
 
-            var t1 = (dx / that.plane.width()) * time;
-            var t2 = ((planeWidth - x) / that.plane.width()) * time;
 
-            console.log("["+orb.getId()+"] x: " + x + " t2: " + t2 + " | dx: " + dx + " t1: " + t1);
-
-            orb.getElement().animate({
-                "left": "-=" + dx
-            }, t1, "linear", function () {
-                orb.setX(planeWidth + orb.getWidth());
-            });
-
-            orb.getElement().promise().done(function () {
-//            console.log(orb.getId() + " done");
-                $(this).animate({
-                    "left": x
-                }, t2, "linear", function () {
-                    orb.setX(x);
-
-                });
-            });
+        var a = new Animation({
+            "tag" : "animateMotion",
+            "dur" : time,
+            "repeatCount" : loop ? "indefinite" : 1,
+            "parent" : orb.getElement()
         });
-        */
-        var animation0, animation1;
-
-        var planeWidth = this.getPlane().width();
-        var dx = (orb.getX() + orb.getWidth()); //side it as far as it can go to the right
-
-        var x = orb.getX();
-
-        var t1 = (dx / this.plane.width()) * time;
-        var t2 = ((planeWidth - x) / this.plane.width()) * time;
-
-        var  y = orb.getY();
-
-        animation0 = [{
-            "left" : "-="+dx,
-            "top": y
-        }, t1, function(){
-            orb.setX(planeWidth + orb.getWidth());
-        }];
-        animation1 = [{
-            "left" : x,
-            "top" : y
-        }, t2, function(){
-            orb.setX(x);
-        }];
-        orb.addAnimation(animation0);
-        orb.addAnimation(animation1);
-        if(loop){
-            orb.loop();
-        }
-        else {
-            orb.play();
-        }
+        var mpath = a.makeElement("mpath");
+        a.setAttributeNameSpace(mpath, "href", "#motionPath-"+unique);
+        a.addChild(mpath);
+        a.display()
     };
+
+
 
     this.float = function(orbs){
 

@@ -1,33 +1,26 @@
 function Orb(id, plane, opts) {
     this.id = id;
-    this.x = 0;
-    this.y = 0;
     this.z = 1;
-    this.height = 0;
-    this.width = 0;
-    this.radius = 0;
+    this.radius = opts["radius"] ? opts["radius"] : 0;
     this.color = "#000";
     this.plane = plane;
-    this.blurAmount = opts["blurAmount"] ? opts["blurAmount"] : Math.round(Math.random() + 2) ;
-/*
-    this.ele = $("<svg><defs>" +
-    "<filter>" +
-    "<feGaussianBlur />" +;
-    "</filter>"+
-    "</defs>" +
-    "<circle />" +
-    "</svg>");
-    */
-    this.ele = $(document.createElementNS("http://www.w3.org/2000/svg", "circle"));
-    this.circle = this.ele;//$(this.ele).find("circle");
-    this.filter = $(this.ele).find("filter");
-    this.blurEffect = $(this.ele).find("feGaussianBlur");
+    this.blurAmount = opts["blurAmount"] ? opts["blurAmount"] : Math.round(Math.random() + 2);
+    this.animations = opts["animations"] ? opts["animations"] : [];
+    this.element = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    //this.circle = this.elemenet;//$(this.ele).find("circle");
+    this.filter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
+    this.blurEffect = document.createElementNS("http://www.w3.org/2000/svg","feGaussianBlur");
+   // this.element.appendChild(this.filter);
+    this.filter.appendChild(this.blurEffect);
     this.c_x = 0;
     this.c_y = 0;
-
     this.currentAnimation = 0;
     this.animations = [];
     this.intervalId = 0;
+
+    this.newAnimation = function(){
+
+    };
 
     this.addAnimation = function(a){
         this.animations.push(a);
@@ -141,7 +134,7 @@ function Orb(id, plane, opts) {
     };
     this.setCircleX = function(x) {
         this.c_x = x;
-        this.circle.attr("cx", x);
+        this.element.setAttribute("cx", x);
         return this;
     };
 
@@ -150,7 +143,7 @@ function Orb(id, plane, opts) {
     };
     this.setCircleY = function(y) {
         this.c_y = y;
-        this.circle.attr("cy", y);
+        this.element.setAttribute("cy", y);
         return this;
     };
 
@@ -180,8 +173,8 @@ function Orb(id, plane, opts) {
         return this.blurAmount;
     };
     this.setBlurAmount = function(i) {
-       // this.blurAmount = i;
-       // this.blurEffect[0].setAttribute("stdDeviation", i);
+       this.blurAmount = i;
+        this.blurEffect.setAttribute("stdDeviation", i);
         return this;
     };
 
@@ -194,7 +187,7 @@ function Orb(id, plane, opts) {
     };
     this.setColor = function (c) {
         this.color = c;
-        this.circle.attr("fill", c);
+        this.element.setAttribute("fill", c);
         return this;
     };
 
@@ -203,16 +196,12 @@ function Orb(id, plane, opts) {
     };
     this.setRadius = function(r){
         this.radius = r;
-        this.circle.attr("r", r);
+        this.element.setAttribute("r", r);
         return this;
     };
 
     this.getElement = function () {
-        return this.ele;
-    };
-
-    this.getCircle = function() {
-        return this.circle;
+        return this.element;
     };
 
     this.getFilter = function() {
@@ -224,10 +213,12 @@ function Orb(id, plane, opts) {
     };
 
     this.show = function(){
-       return this.getElement().show();
+        this.element.style.display = "block";
+       return this;
     };
     this.hide = function(){
-        return this.getElement().hide();
+        this.element.style.display = "none";
+        return this;
     };
 
     //init the orb to default values
@@ -235,9 +226,7 @@ function Orb(id, plane, opts) {
         "position" : "absolute"
     };
 
-    this.showProperties = function(){
-        this.getElement().append("<text fill='red'>Test</text>>");
-    };
+
 
     this._init = function() {
       //  this.ele.css(base_css);
@@ -248,9 +237,18 @@ function Orb(id, plane, opts) {
       //  this.setHeight(this.height);
         this.setColor(this.color);
         this.setRadius(this.radius);
-        //this.filter.attr("height", "200%").attr("width", "200%").attr("x", "-50%").attr("y", "-50%");
-        //this.blurEffect.attr("in", "SourceGraphic");
-        //this.setBlurAmount(this.blurAmount);
+
+        this.filter.setAttribute("height", "200%");
+        this.filter.setAttribute("width", "200%");
+        this.filter.setAttribute("x", "-50%")
+        this.filter.setAttribute("y", "-50%");
+
+        this.blurEffect.setAttribute("in", "SourceGraphic");
+        this.setBlurAmount(this.blurAmount);
+        var timestamp = Math.round(new Date().getTime() * Math.random());
+        var id = "filter-" + timestamp;
+        this.element.setAttribute("filter", "url(#"+id+")");
+        this.filter.setAttribute("id", id)
     };
     this._init();
 }//Orb class
