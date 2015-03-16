@@ -148,7 +148,6 @@ function Floater(opts){
         path.path.attr("id", "motionPath-"+unique);
         path.build().display();
 
-
         var a = new Animation({
             "tag" : "animateMotion",
             "dur" : time,

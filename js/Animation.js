@@ -46,6 +46,10 @@ function Animation(opts)
         return document.createElementNS('http://www.w3.org/2000/svg', tag);
     };
 
+    this.getElement = function(){
+        return this.element;
+    };
+
     this.addChildren = function(c){
         for(var i = 0; i < c.length; i++){
             this.addChild(c[i]);

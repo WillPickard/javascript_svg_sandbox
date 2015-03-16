@@ -27,7 +27,7 @@ function main() {
     var red = new ColorController("red");
 
     PLANE = $plane;
-    PLANE.css({"background" : "black"});
+    //PLANE.css({"background" : "black"});
     /***/
     /**/
     var o1 = new OrbController(100, 50, 50, {
@@ -88,27 +88,100 @@ function main() {
 
     var r = 200;
     var c = 2 * Math.PI * r;
-
-    var point_r = 10;
+    var point_r = 20;
     var n_orbs = 50;
-    var origin = [700, 250];
-    var dx = c / n_orbs;
+    var origin = [250, 250];
+    var dx = (2*r) / n_orbs;
+    var circumference = new Path({"stroke": "blue", "stroke-width" : 1});
+    circumference.getElement().setAttribute("id", "circlePath");
+    //circumference.moveTo(origin[0], origin[1]);
+    var points = [n_orbs]; //for the circumference
 
     for(var i = 0; i < n_orbs; i++){
         var x, y;
-        x = (origin[0] -r) + dx * i;
-        y = origin[1] +  Math.sqrt(Math.pow(r,2) - Math.pow(x - origin[0], 2));
+        x = (origin[0] - r) + (dx * i);
+        var pointIndex = 0;
+        //evens are below x-axis and odds are above
+        if(i % 2 === 0){
+            //even
+            y = origin[1] - (Math.sqrt(Math.pow(r,2) - Math.pow(x - origin[0], 2)));
+            pointIndex = i / 2;
+        }
+        else{
+            y = origin[1] + (Math.sqrt(Math.pow(r,2) - Math.pow(x - origin[0], 2)));
+            pointIndex = n_orbs - (i + 1)/2;
+        }
+
+        //x^2+y^2+z^2=r^2
+        var relx, rely;
+        relx = x - origin[0];
+        rely = y - origin[1];
+        var z = Math.sqrt(Math.pow(r, 2) - Math.pow(relx, 2) - Math.pow(rely, 2));
+   //     console.log("(" + relx + ", " + rely + ", " + z + ")");
         var orb = new Orb("orb"+i, $plane, {
             "radius" : point_r,
             "blurAmount": 0,
             "withFilter": false
         });
-        orb.setX(x);
-        orb.setY(y);
+      //  orb.setX(x);
+      //  orb.setY(y);
         orb.setColor("red");
         $plane.append(orb.getElement());
+
+        var id = "circlePath-"+i;
+        var p = new Path({
+           "plane" : $plane,
+            "stroke-width": 0
+        });
+        p.getElement().setAttribute("id", id);
+        p.moveTo(x, y);
+
+        var a = new Animation({
+            "tag" : "animateMotion",
+            "dur" : "10s",
+            "repeatCount" : "indefinite",
+            "parent" : orb.getElement()
+        });
+
+        var ar = new Animation({
+            "tag" : "animate",
+            "attributeName" : "r",
+            "from" : point_r,
+            "to" : point_r + (point_r / 3),
+            "dur" : "3s",
+            "repeatCount" : "indefinite",
+            "parent" : orb.getElement()
+        });
+
+        var mpath = a.makeElement("mpath");
+        a.setAttributeNameSpace(mpath, "href", "#" + id);
+        a.addChild(mpath);
+        a.display();
+
+        ar.display();
+
+        points[pointIndex] = [x, y, p];
     }
 
+    for(var i = 0; i < points.length; i++){
+        if(i == 0)
+            circumference.moveTo(points[i][0], points[i][1]);
+        else
+            circumference.lineTo(points[i][0], points[i][1]);
+        var j = (i == points.length - 1) ? 0 : i + 1;
+
+        while(j !== (i)){
+            points[i][2].lineTo(points[j][0], points[j][1]);
+            if(j >= points.length - 1){
+                j = 0;
+            }
+            else{
+                j++;
+            }
+        }
+
+        points[i][2].build().display();
+    }
     var x_axis = new Path({
         "stroke" : "green",
         "stroke-width" : "3"
@@ -122,9 +195,14 @@ function main() {
     y_axis.moveTo(origin[0], origin[1] - r).lineTo(origin[0], origin[1] + r);
     x_axis.build();
     y_axis.build();
+    circumference.build();
 
     $plane.append(x_axis.getElement());
     $plane.append(y_axis.getElement());
+   // $plane.append(circumference.getElement());
+
+    //trying to compute sphere
+    makeSphere([0, 0, 0], 3, 1);
 
 }
 function makePlane(){
@@ -135,13 +213,92 @@ function makePlane(){
         "top" : (WINDOW_HEIGHT - PLANE_HEIGHT) / 2
     };
     plane.css(css);
-   // plane.attr("width", PLANE_WIDTH);
-  //  plane.attr("height", PLANE_HEIGHT);
+    // plane.attr("width", PLANE_WIDTH);
+    // plane.attr("height", PLANE_HEIGHT);
 
-    //plane.append("<p style='position: absolute; top: 5px; left: 5px; color:red'>Height: " + PLANE_HEIGHT + " width " + PLANE_WIDTH +"</p>")
+    // plane.append("<p style='position: absolute; top: 5px; left: 5px; color:red'>Height: " + PLANE_HEIGHT + " width " + PLANE_WIDTH +"</p>")
 
-   // plane.css(css);
+    // plane.css(css);
     return plane;
+}
+
+function makeSphere(origin, radius, accuracy)
+{
+    var cx = origin[0];
+    var cy = origin[1];
+    var cz = origin[2];
+
+    var minX = cx - radius;
+    var maxX = cx + radius;
+
+    var maxY = cy + radius;
+    var minY = cy - radius;
+
+    var maxZ = cz + radius;
+    var minZ = cz - radius;
+
+    var diameter = 2 * radius;
+    var totalPoints = diameter / accuracy;
+    var dx = diameter / totalPoints;
+
+    var points = []; //3d array
+
+    //for each possible x, there are +-y and +-z
+    //  for each +-z
+    //      there are <y>
+    //  foreach +-y
+    //      there are <z>
+
+    var x, y, z, r_s, x_s, y_s, p_y, n_y, p_z, n_z;
+    r_s = Math.pow(radius, 2);
+    for(x = minX; x < maxX; x+=dx)
+    {
+        console.log("x: " + x);
+        points[x] = {
+            "y" : [],
+            "z" : []
+        };
+        x_s = Math.pow(x, 2);
+        y = Math.sqrt(r_s - x_s);
+        p_y = y;
+        n_y = 0 - y;
+
+        var dy = p_y / (radius - accuracy);
+       // console.log("py : " + p_y + " dy: " + dy);
+        for(y = 0; y < p_y; y+=dy){
+            z = spherePoint(radius, x, y);
+            points[x]["y"][y] = z;
+        }
+        var iters = 0;
+        for(y = 0; y > n_y; y-=dy)
+        {
+       //     if(iters++ > 10) break;
+            console.log(y);
+            points[x]["y"][y] = spherePoint(radius, x, y);
+        }
+   //     console.log("\t" + n_y);
+    }
+    console.log("points: ");
+    console.log(points);
+}
+
+//given radius return the possible points
+//for f(p1,p2)
+//result is array with 0: + and 1: -
+function spherePoint(r, p1, p2){
+    var r_s, p1_s, p2_s, res, p3;
+
+    r_s = Math.pow(r,2);
+    p1_s = Math.pow(p1, 2);
+    p2_s = Math.pow(p2, 2);
+
+    res = [];
+
+    p3 = Math.sqrt(r_s - p1_s - p2_s);
+
+    res.push(p3);
+    res.push(p3 * -1);
+    return res;
 }
 
 
