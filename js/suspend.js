@@ -85,7 +85,7 @@ function main() {
 
     //$plane.append(orb1.getElement());
    // $plane.append(orb2.getElement());
-
+/*
     var r = 200;
     var c = 2 * Math.PI * r;
     var point_r = 20;
@@ -203,7 +203,9 @@ function main() {
 
     //trying to compute sphere
     makeSphere([0, 0, 0], 3, 1);
+    */
 
+    test();
 }
 function makePlane(){
     var plane = $("<svg height='" + PLANE_HEIGHT + "' width='" + PLANE_WIDTH +"' xmlns='http://www.w3.org/2000/svg'></svg>");
@@ -301,10 +303,241 @@ function spherePoint(r, p1, p2){
     return res;
 }
 
+function makeCircle(r, dx) {
+    var totalPoints = (2*r) / dx;
+    var minX = (-1) * r;
+    var maxX = r;
+    var points = [];
+
+    var currentX = minX;
+    for(var i = 0; i <= totalPoints; i++){
+        var ys = circlePoint(r, currentX);
+        for(var y in ys) {
+            points.push([currentX, ys[y]]);
+        }
+        currentX += dx;
+    }
+
+    return points;
+
+}
+
+function circlePoint(r, p) {
+    var r_s, p_s, res;
+    r_s = Math.pow(r,2);
+    p_s = Math.pow(p,2);
+    res = Math.sqrt(r_s - p_s);
+
+    var ret = [];
+    ret.push(res);
+    if(res !== 0){
+        ret.push(-1 * res);
+    }
+
+    return ret;
+}
 
 
+function test(){
 
+    var centerX = window.innerWidth / 2;
+    var centerY = window.innerHeight / 2;
 
+    var origin = [centerX/2, centerY];
+    createGrid(origin, 250);
 
+    var r = 100;
+    var dx = 1;
+    var points = makeCircle(r, dx);
+
+    var o_opts = {
+        "radius": 1,
+        "color": "black",
+        "withFilter": false
+    };
+
+    var x, y,point;
+    for(var i = 0; i < points.length; i++) {
+        point = new Orb(i, $plane, o_opts);
+
+        x = origin[0] + points[i][0];
+        y = origin[1] + points[i][1];
+
+        point.setX(x);
+        point.setY(y);
+        displayThing(point);
+    }
+
+    var square_origin = [centerX + centerX/2, centerY];
+    createGrid(square_origin, 250);
+    var s = 200;
+    var cube = Cube(square_origin, s);
+
+    displayThings(cube);
+}
+
+function displayThing(thing)
+{
+    $plane.append(thing.getElement());
+}
+
+function displayThings(things){
+    for(var i in things){
+        displayThing(things[i]);
+    }
+}
+
+function createGrid(origin, length){
+    var maxX, minX, maxY, minY;
+
+    maxX = origin[0] + length;
+    minX = origin[0] - length;
+
+    maxY = origin[1] + length;
+    minY = origin[1] - length;
+
+    var x_axis, y_axis;
+    var opts = {
+        "stoke" : "black",
+        "stroke-width" : "1"
+    };
+    x_axis = new Path(opts);
+    y_axis = new Path(opts);
+
+    x_axis.moveTo(minX, origin[1]);
+    x_axis.lineTo(maxX, origin[1]);
+    y_axis.moveTo(origin[0], minY);
+    y_axis.lineTo(origin[0], maxY);
+
+    x_axis.build();
+    y_axis.build();
+
+    displayThing(x_axis);
+    displayThing(y_axis);
+}
+
+function Square(origin, s){
+    var opts = {
+        "stroke" : "black",
+        "stroke-width" : 1
+    };
+
+    var ox = origin[0];
+    var oy = origin[1];
+
+    var hs = s/2; //half of side to avoid redundant computation
+    var minX, maxX, minY, maxY;
+    minX = ox - hs;
+    maxX = ox + hs;
+    minY = oy - hs;
+    maxY = oy + hs;
+
+    var path  = new Path(opts);
+
+    path.moveTo(minX, maxY);
+    path.lineTo(maxX, maxY);
+    path.lineTo(maxX, minY);
+    path.lineTo(minX,minY);
+    path.lineTo(minX, maxY);
+
+    path.build();
+    return path;
+}
+
+function Cube(origin, s) {
+    var lines = [];
+
+    var ox = origin[0];
+    var oy = origin[1];
+    var hs = s/2; //half of side to avoid redundant computation
+    var minX, maxX, minY, maxY;
+    minX = ox - hs;
+    maxX = ox + hs;
+    minY = oy - hs;
+    maxY = oy + hs;
+
+    var vertices = [];
+    var s4 = s/2; //save time computing and typing
+    //vertices for front side
+    vertices.push([minX, maxY]); //bottom left - 0
+    vertices.push([maxX, maxY]); //bottom right - 1
+    vertices.push([maxX, minY]); //top right - 2
+    vertices.push([minX, minY]); //top left - 3
+    //vertices for back side
+    vertices.push([minX + s4, maxY - s4]); //bottom left - 4
+    vertices.push([maxX + s4, maxY - s4]); //bottom right - 5
+    vertices.push([maxX + s4, minY - s4]); //top right - 6
+    vertices.push([minX + s4, minY - s4]); //top left - 7
+
+    for(var v = 0; v < vertices.length; v++ ){
+        var point = new Orb("vertex"+v, $plane,{
+            "radius" : "2",
+            "color" : "black",
+            "withFilter" : false
+        });
+        point.setX(vertices[v][0]).setY(vertices[v][1]);
+        displayThing(point);
+    }
+    var front, back, left, right, top, bottom;
+    var base_opts = {
+        "stroke" : "black",
+        "stroke-width" : "1"
+    };
+
+    front = Square(origin, s);
+    back = Square([origin[0] + s/4, origin[1] - s/4], s);
+    top = new Path(base_opts);
+    left = new Path(base_opts);
+    right = new Path(base_opts);
+    bottom = new Path(base_opts);
+
+    top.moveTo(vertices[3][0], vertices[3][1])
+        .lineTo(vertices[7][0], vertices[7][1])
+        .lineTo(vertices[6][0], vertices[6][1])
+        .lineTo(vertices[2][0], vertices[2][1])
+        .lineTo(vertices[3][0], vertices[3][1])
+        .build();
+
+    bottom.moveTo(vertices[0][0], vertices[0][1])
+        .lineTo(vertices[4][0], vertices[4][1])
+        .lineTo(vertices[5][0], vertices[5][1])
+        .lineTo(vertices[1][0], vertices[1][1])
+        .lineTo(vertices[0][0], vertices[0][1])
+        .build();
+
+    left.moveTo(vertices[0][0], vertices[0][1])
+        .lineTo(vertices[3][0], vertices[3][1])
+        .lineTo(vertices[7][0], vertices[7][1])
+        .lineTo(vertices[4][0], vertices[4][1])
+        .lineTo(vertices[0][0], vertices[0][1])
+        .build();
+
+    right.moveTo(vertices[1][0], vertices[1][1])
+        .lineTo(vertices[2][0], vertices[2][1])
+        .lineTo(vertices[6][0], vertices[6][1])
+        .lineTo(vertices[5][0], vertices[5][1])
+        .lineTo(vertices[1][0], vertices[1][1])
+        .build();
+
+    top.setFill("black");
+    front.setFill("black");
+    bottom.setFill("black");
+    back.setFill("black");
+    right.setFill("black");
+    left.setFill("black");
+
+    front.getElement().style.opacity = 0.3;
+    top.getElement().style.opacity = 0.5;
+    bottom.getElement().style.opacity = 0.5;
+    back.getElement().style.opacity = 0.5;
+
+    lines.push(back);
+    lines.push(front);
+    lines.push(top);
+    lines.push(bottom);
+    lines.push(left);
+    lines.push(right);
+    return lines;
+}
 
 
